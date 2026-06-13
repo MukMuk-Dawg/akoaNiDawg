@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sip & Chill — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Poppins',sans-serif;background:linear-gradient(-45deg,#F5F0E8,#efe3d6);min-height:100vh;margin:0;padding:28px;color:#111}
+.container{max-width:1100px;margin:0 auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.header h1{font-size:20px}
+.btn{background:#111;color:#F5F0E8;padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+.table{width:100%;border-collapse:collapse;margin-top:12px}
+.table th,.table td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+.actions button{margin-right:6px}
+.status-badge{padding:6px 10px;border-radius:12px;font-weight:600}
+.status-pending{background:#FFEBEE;color:#C62828}
+.status-completed{background:#E8F5E9;color:#2E7D32}
+.card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
+.search{margin-top:8px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .18s}
+.modal.active{opacity:1;pointer-events:auto}
+.modal-box{background:#fff;padding:18px;border-radius:12px;width:90%;max-width:640px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Admin — Orders</h1>
+    <div>
+      <a href="index.html" class="btn">← Frontend</a>
+      <a href="status.html" class="btn" style="margin-left:8px">Status</a>
+      <button id="refreshBtn" class="btn">Refresh</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <strong>Total Orders:</strong> <span id="ordersCount">0</span>
+      </div>
+      <div>
+        <input id="searchInput" placeholder="Search order code or name" style="padding:8px;border-radius:8px;border:1px solid #eee;width:260px">
+        <select id="filterStatus" style="padding:8px;border-radius:8px;border:1px solid #eee;margin-left:8px">
+          <option value="all">All</option>
+          <option value="Pending">Pending</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+    </div>
+
+    <table class="table" id="ordersTable">
+      <thead>
+        <tr>
+          <th>Order Code</th>
+          <th>Method</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Timestamp</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal" id="detailModal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>Order Details</strong>
+      <button id="closeDetail" class="btn">Close</button>
+    </div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<script>
+function loadOrders(){
+  return JSON.parse(localStorage.getItem('sipChillOrders')) || [];
+}
+function saveOrders(list){
+  localStorage.setItem('sipChillOrders', JSON.stringify(list));
+}
+
+function render(){
+  const all = loadOrders();
+  const tbody = document.getElementById('ordersBody');
+  const countEl = document.getElementById('ordersCount');
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const statusFilter = document.getElementById('filterStatus').value;
+  tbody.innerHTML = '';
+
+  const filtered = all.filter(o => {
+    if(statusFilter !== 'all' && o.status !== statusFilter) return false;
+    if(!q) return true;
+    return (o.orderId && o.orderId.toLowerCase().includes(q)) || (o.locationInfo && o.locationInfo.toLowerCase().includes(q)) || (o.name && o.name.toLowerCase().includes(q));
+  });
+
+  countEl.innerText = filtered.length;
+
+  filtered.reverse().forEach((o, idx) => {
+    const tr = document.createElement('tr');
+    const statusClass = o.status === 'Completed' ? 'status-completed' : 'status-pending';
+    tr.innerHTML = `
+      <td>${o.orderId || ''}</td>
+      <td>${o.method || ''}</td>
+      <td>${o.name || ''}</td>
+      <td>${o.itemsCount || ''}</td>
+      <td>₱${o.totalAmount || 0}</td>
+      <td><span class="status-badge ${statusClass}">${o.status || 'Pending'}</span></td>
+      <td>${o.timestamp || ''}</td>
+      <td class="actions">
+        <button class="btn" onclick="viewDetails(${idx})">View</button>
+        <button class="btn" onclick="toggleComplete(${idx})">Mark</button>
+        <button class="btn" onclick="deleteOrder(${idx})" style="background:#b71c1c">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function viewDetails(index){
+  const orders = loadOrders();
+  if(!orders[index]) return;
+  const o = orders[index];
+  const content = document.getElementById('detailContent');
+  let html = `<div><b>Order:</b> ${o.orderId || ''}</div>`;
+  html += `<div><b>Method:</b> ${o.method}</div>`;
+  html += `<div><b>Customer:</b> ${o.name || ''}</div>`;
+  html += `<div><b>Contact / Barangay:</b> ${o.phone || ''} / ${o.barangay || ''}</div>`;
+  html += `<div style="margin-top:8px"><b>Items (${o.itemsCount}):</b></div>`;
+  html += '<ul>';
+  (o.cart||[]).forEach(i=> html += `<li>${i.name} x${i.qty} — ₱${i.price * i.qty}</li>`);
+  html += '</ul>';
+  html += `<div style="margin-top:8px"><b>Total:</b> ₱${o.totalAmount}</div>`;
+  content.innerHTML = html;
+  document.getElementById('detailModal').classList.add('active');
+}
+
+document.getElementById('closeDetail').addEventListener('click', ()=>{
+  document.getElementById('detailModal').classList.remove('active');
+});
+
+function toggleComplete(index){
+  const orders = loadOrders();
+  if(!orders[index]) return;
+  orders[index].status = orders[index].status === 'Completed' ? 'Pending' : 'Completed';
+  saveOrders(orders);
+  render();
+}
+
+function deleteOrder(index){
+  if(!confirm('Delete this order?')) return;
+  const orders = loadOrders();
+  orders.splice(index,1);
+  saveOrders(orders);
+  render();
+}
+
+// helpers to map reversed index to real index when rendering reversed list
+
+function bindEvents(){
+  document.getElementById('searchInput').addEventListener('input', render);
+  document.getElementById('filterStatus').addEventListener('change', render);
+  document.getElementById('refreshBtn').addEventListener('click', render);
+}
+
+// Fix: because we reverse before displaying, view/toggle/delete use the index into the reversed list.
+// We'll wrap the original functions to compute proper index.
+function viewDetails(revIndex){ const orders = loadOrders(); const realIndex = orders.length - 1 - revIndex; viewDetails_real(realIndex); }
+function viewDetails_real(index){ const orders = loadOrders(); if(!orders[index]) return; const o = orders[index]; const content = document.getElementById('detailContent'); let html = `<div><b>Order:</b> ${o.orderId || ''}</div>`; html += `<div><b>Method:</b> ${o.method}</div>`; html += `<div><b>Customer:</b> ${o.name || ''}</div>`; html += `<div><b>Contact / Barangay:</b> ${o.phone || ''} / ${o.barangay || ''}</div>`; html += `<div style="margin-top:8px"><b>Items (${o.itemsCount}):</b></div>`; html += '<ul>'; (o.cart||[]).forEach(i=> html += `<li>${i.name} x${i.qty} — ₱${i.price * i.qty}</li>`); html += '</ul>'; html += `<div style="margin-top:8px"><b>Total:</b> ₱${o.totalAmount}</div>`; content.innerHTML = html; document.getElementById('detailModal').classList.add('active'); }
+
+function toggleComplete(revIndex){ const orders = loadOrders(); const realIndex = orders.length - 1 - revIndex; orders[realIndex].status = orders[realIndex].status === 'Completed' ? 'Pending' : 'Completed'; saveOrders(orders); render(); }
+function deleteOrder(revIndex){ if(!confirm('Delete this order?')) return; const orders = loadOrders(); const realIndex = orders.length - 1 - revIndex; orders.splice(realIndex,1); saveOrders(orders); render(); }
+
+// Initialize with some sample if none present (optional)
+(function init(){
+  if(!localStorage.getItem('sipChillOrders')){
+    localStorage.setItem('sipChillOrders', JSON.stringify([]));
+  }
+  bindEvents();
+  render();
+})();
+</script>
+</body>
+</html>

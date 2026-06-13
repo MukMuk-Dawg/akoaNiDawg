@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sip & Chill</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --black:#111;
+    --beige:#F5F0E8;
+    --accent:#C8B6A6;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:linear-gradient(-45deg,#F5F0E8,#efe3d6,#f5f0e8,#e9dccb);
+    background-size:400% 400%;
+    animation:bgMove 12s ease infinite;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--beige);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--black);
+    border-radius: 10px;
+}
+
+/* FLOATING ITEMS */
+.floating{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:1;
+}
+
+.drink{
+    position:absolute;
+    bottom:-100px;
+    font-size:32px;
+    animation:floatUp linear infinite;
+    opacity:.6;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.08));
+}
+
+@keyframes floatUp{
+    0%{
+        transform:translateY(0) rotate(0deg) scale(0.8);
+        opacity:0;
+    }
+    10%{
+        opacity:0.8;
+    }
+    90%{
+        opacity:0.8;
+    }
+    100%{
+        transform:translateY(-125vh) rotate(360deg) scale(1.2);
+        opacity:0;
+    }
+}
+
+/* NAVBAR */
+nav{
+    background:var(--black);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 8%;
+    position:sticky;
+    top:0;
+    z-index:100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.logo{
+    color:var(--beige);
+    font-size:24px;
+    font-weight:700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.nav-actions{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+#userText {
+    color: var(--beige);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+#userText:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.nav-btn{
+    background:var(--beige);
+    color:var(--black);
+    border:none;
+    padding:8px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:600;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+.nav-btn:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.nav-btn:active {
+    transform: translateY(0);
+}
+
+.admin-link {
+    background: transparent;
+    color: #8b5cf6;
+    border: 1px solid #8b5cf6;
+    box-shadow: none;
+}
+
+.admin-link:hover {
+    background: #8b5cf6;
+    color: var(--beige);
+}
+
+/* HERO SECTION */
+.hero{
+    min-height:90vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    position:relative;
+    z-index:5;
+    padding:40px 20px;
+}
+
+.hero h1{
+    font-size:65px;
+    color:#111;
+    line-height: 1.2;
+    margin-bottom: 5px;
+    animation: fadeInDown 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.hero p{
+    margin:15px 0 25px 0;
+    font-size:19px;
+    color: #444;
+    letter-spacing: 0.5px;
+    animation: fadeInUp 0.8s ease forwards 0.2s;
+    opacity: 0;
+}
+
+.hero .btn-container {
+    animation: fadeInUp 0.8s ease forwards 0.4s;
+    opacity: 0;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.btn{
+    display:inline-block;
+    padding:14px 30px;
+    background:var(--black);
+    color:var(--beige);
+    border-radius:25px;
+    text-decoration:none;
+    cursor:pointer;
+    border: none;
+    font-weight: 500;
+    font-size: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.btn:hover{
+    background: #333;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+
+.btn:active{
+    transform: translateY(-1px);
+}
+
+/* ABOUT SECTION */
+.about{
+    padding:90px 12%;
+    text-align:center;
+    background:rgba(255,255,255,.45);
+    backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+    position:relative;
+    z-index:5;
+    border-top: 1px solid rgba(255,255,255,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+
+.about h2{
+    font-size:42px;
+    margin-bottom:25px;
+    color: var(--black);
+}
+
+.about p{
+    max-width:850px;
+    margin:auto;
+    line-height:1.9;
+    font-size:17px;
+    color:#222;
+}
+
+/* MODERN DYNAMIC MODALS */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 20px;
+}
+
+.modal.active {
+    opacity: 1;
+}
+
+.modal-box{
+    width:100%;
+    max-width:390px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding:30px;
+    position:relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+    transform: scale(0.85);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal.active .modal-box {
+    transform: scale(1);
+}
+
+.close{
+    position:absolute;
+    right:18px;
+    top:12px;
+    cursor:pointer;
+    font-size:26px;
+    color: #888;
+    transition: color 0.2s;
+}
+.close:hover {
+    color: var(--black);
+}
+
+.tabs{
+    display:flex;
+    background:#e8e8e8;
+    border-radius:25px;
+    margin-bottom:25px;
+    overflow: hidden;
+    padding: 3px;
+}
+
+.tabs button{
+    flex:1;
+    padding:11px;
+    border:none;
+    border-radius: 22px;
+    cursor:pointer;
+    background: transparent;
+    font-weight: 600;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.tabs button.active{
+    background:var(--black);
+    color:var(--beige);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    color: #444;
+    margin-top: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+input, select {
+    width:100%;
+    padding:12px;
+    margin:5px 0 10px 0;
+    border:2px solid #eee;
+    border-radius:10px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    background: white;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--black);
+}
+
+.profile-detail-item {
+    margin: 15px 0;
+    font-size: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.profile-detail-item strong {
+    color: #666;
+    white-space: nowrap;
+}
+
+.profile-detail-item span {
+    font-weight: 500;
+    color: var(--black);
+    word-break: break-word;
+    text-align: right;
+}
+
+/* FOOTER */
+footer{
+    background:#111;
+    color:#F5F0E8;
+    padding:60px 10% 40px;
+    position:relative;
+    z-index:5;
+}
+
+.footer-container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:40px;
+}
+
+.footer-box h3{
+    margin-bottom:20px;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+}
+
+.footer-box p,
+.footer-box a{
+    color:#bbb;
+    text-decoration:none;
+    line-height:1.9;
+    font-size: 15px;
+}
+
+.footer-box a:hover{
+    color:white;
+    text-decoration: underline;
+}
+
+.footer-bottom{
+    border-top:1px solid #262626;
+    margin-top:40px;
+    padding-top:25px;
+    text-align:center;
+    color:#777;
+    font-size: 14px;
+}
+
+/* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+@media (max-width: 992px) {
+    nav { padding: 18px 5%; }
+    .hero h1 { font-size: 50px; }
+    .about { padding: 70px 6%; }
+}
+
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px 20px;
+        text-align: center;
+    }
+    .nav-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    #userText, .nav-btn {
+        font-size: 13px;
+        padding: 6px 14px;
+    }
+    .hero h1 { font-size: 40px; }
+    .hero p { font-size: 17px; }
+    .about h2 { font-size: 32px; }
+    .about p { font-size: 15px; }
+    .footer-container { gap: 30px; }
+}
+
+@media (max-width: 480px) {
+    .logo { font-size: 20px; }
+    .nav-actions { gap: 8px; }
+    #userText { width: 100%; text-align: center; order: -1; }
+    .hero h1 { font-size: 32px; }
+    .hero p { font-size: 15px; }
+    .btn { padding: 12px 24px; font-size: 14px; width: 100%; }
+    .about { padding: 50px 20px; }
+    .about h2 { font-size: 28px; }
+    .modal-box { padding: 20px 15px; }
+    .footer-container { grid-template-columns: 1fr; text-align: center; }
+    .footer-box h3 { margin-bottom: 10px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="floating">
+    <div class="drink" style="left:10%;animation-duration:10s;">🍔</div>
+    <div class="drink" style="left:25%;animation-duration:14s;">🥤</div>
+    <div class="drink" style="left:40%;animation-duration:12s;">🍵</div>
+    <div class="drink" style="left:60%;animation-duration:11s;">☕</div>
+    <div class="drink" style="left:80%;animation-duration:13s;">🍹</div>
+    <div class="drink" style="left:90%;animation-duration:15s;">🍕</div>
+</div>
+
+<nav>
+    <div class="logo">Sip & Chill ☕</div>
+    <div class="nav-actions">
+        <span id="userText" onclick="openProfileModal()" title="View Profile Details"></span>
+        <a href="admin.html" id="statusBtn" class="nav-btn admin-link" style="display:none;">📊 Status</a>
+        <a href="admin.html" id="adminSysBtn" class="nav-btn admin-link" style="display:none;">🛠️ Admin System</a>
+        <button id="loginBtn" class="nav-btn" onclick="openModal()">Login</button>
+        <button id="logoutBtn" class="nav-btn" onclick="logout()" style="display:none;">Logout</button>
+    </div>
+</nav>
+
+<section class="hero">
+    <div>
+        <h1>Refresh Every Moment ☕</h1>
+        <p>Milk Tea • Coffee • Smoothies • Desserts • Foods</p>
+        <div class="btn-container">
+            <a href="menu.html" class="btn" onclick="return goMenu()">View Menu</a>
+        </div>
+    </div>
+</section>
+
+<section class="about" id="about">
+    <h2>About Us</h2>
+    <p>
+        Welcome to <strong>Sip & Chill</strong>, your favorite place to relax,
+        enjoy refreshing drinks, and satisfy your cravings. We proudly serve
+        delicious milk teas, premium coffee, smoothies, desserts, and tasty food
+        made with quality ingredients and lots of love. Our goal is to create a
+        cozy and friendly space where friends, families, and students can unwind,
+        connect, and enjoy every sip. Whether you're looking for a quick caffeine
+        boost or a sweet treat after a long day, Sip & Chill is here to make
+        every moment refreshing and memorable.
+    </p>
+</section>
+
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal()">×</span>
+        <div class="tabs">
+            <button id="loginTab" class="active" onclick="showLogin()">Login</button>
+            <button id="registerTab" onclick="showRegister()">Create Account</button>
+        </div>
+
+        <div id="loginForm">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" placeholder="example@email.com">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter your password">
+            <button class="btn" style="width: 100%; margin-top: 15px; padding: 12px; border-radius: 10px;" onclick="login()">Login</button>
+        </div>
+
+        <div id="registerForm" style="display:none;">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" placeholder="John Doe">
+            
+            <label for="regEmail">Email Address</label>
+            <input type="email" id="regEmail" placeholder="example@email.com">
+            
+            <label for="regPhone">Mobile Number (11 Digits)</label>
+            <input type="text" id="regPhone" placeholder="09123456789" maxlength="11" inputmode="numeric">
+            
+            <label for="regAge">Age (Minimum age 16)</label>
+            <input type="number" id="regAge" placeholder="Enter your age" min="0">
+            
+            <label for="regPassword">Password</label>
+            <input type="password" id="regPassword" placeholder="Create secure password">
+            
+            <button class="btn" style="width: 100%; margin-top: 15px; padding: 12px; border-radius: 10px;" onclick="register()">Create Account</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="profileModal">
+    <div class="modal-box" style="text-align: center;">
+        <span class="close" onclick="closeProfileModal()">×</span>
+        <h3 style="margin-bottom: 20px; border-bottom: 2px solid var(--black); padding-bottom: 8px; font-size: 20px;">👤 Account Profile</h3>
+        
+        <div class="profile-detail-item"><strong>Name:</strong> <span id="profName"></span></div>
+        <div class="profile-detail-item"><strong>Email:</strong> <span id="profEmail"></span></div>
+        <div class="profile-detail-item"><strong>Phone Number:</strong> <span id="profPhone"></span></div>
+        <div class="profile-detail-item"><strong>Age:</strong> <span id="profAge"></span></div>
+        
+        <button class="btn" style="width: 100%; margin-top: 20px; padding: 12px; border-radius: 10px;" onclick="closeProfileModal()">Close Details</button>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-container">
+        <div class="footer-box">
+            <h3>Sip & Chill ☕</h3>
+            <p>Fresh Drinks • Fresh Mood • Fresh Energy</p>
+        </div>
+        <div class="footer-box">
+            <h3>Quick Links</h3>
+            <p><a href="#">Home</a></p> 
+            <p><a href="#about">About Us</a></p>
+            <p><a href="menu.html">Menu</a></p>
+            <p><a href="admin.html">Order Status</a></p>
+        </div>
+        <div class="footer-box">
+            <h3>Contact Us</h3>
+            <p>📞 +63 912 345 6789</p>
+            <p>✉ sipandchill@gmail.com</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © 2026 Sip & Chill. All Rights Reserved.
+    </div>
+</footer>
+
+<script>
+const modal = document.getElementById("modal");
+const profileModal = document.getElementById("profileModal");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const adminSysBtn = document.getElementById("adminSysBtn");
+const statusBtn = document.getElementById("statusBtn");
+const userText = document.getElementById("userText");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+
+const profName = document.getElementById("profName");
+const profEmail = document.getElementById("profEmail");
+const profPhone = document.getElementById("profPhone");
+const profAge = document.getElementById("profAge");
+
+function initializeAdminAccount() {
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    if (!users["admin@sipandchill.com"]) {
+        users["admin@sipandchill.com"] = {
+            name: "System Administrator",
+            phone: "09000000000",
+            age: 30,
+            pass: "admin123",
+            role: "admin"
+        };
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+}
+initializeAdminAccount();
+
+function getActiveUserData() {
+    const currentEmail = localStorage.getItem("user");
+    if (!currentEmail) return null;
+    
+    const users = JSON.parse(localStorage.getItem("users")) || {};
+    const data = users[currentEmail];
+    return data ? { email: currentEmail, ...data } : null;
+}
+
+function openModal(){
+    modal.style.display="flex";
+    setTimeout(() => modal.classList.add("active"), 10);
+    showLogin();
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) closeModal();
+    if (event.target == profileModal) closeProfileModal();
+}
+
+function closeModal(){
+    modal.classList.remove("active");
+    setTimeout(() => modal.style.display="none", 300);
+}
+
+function openProfileModal() {
+    profileModal.style.display = "flex";
+    setTimeout(() => profileModal.classList.add("active"), 10);
+}
+
+function closeProfileModal() {
+    profileModal.classList.remove("active");
+    setTimeout(() => profileModal.style.display = "none", 300);
+}
+
+function goMenu(){
+    if(!localStorage.getItem("user")){
+        openModal();
+        return false;
+    }
+    return true;
+}
+
+function showLogin(){
+    loginForm.style.display="block";
+    registerForm.style.display="none";
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
+}
+
+function showRegister(){
+    loginForm.style.display="none";
+    registerForm.style.display="block";
+    registerTab.classList.add("active");
+    loginTab.classList.remove("active");
+}
+
+function register(){
+    let name = document.getElementById("regName").value.trim();
+    let email = document.getElementById("regEmail").value.trim();
+    let phone = document.getElementById("regPhone").value.trim();
+    let ageInput = document.getElementById("regAge").value;
+    let pass = document.getElementById("regPassword").value;
+
+    if(!name || !email || !phone || !ageInput || !pass) {
+        alert("Please complete all registration fields.");
+        return;
+    }
+
+    let numericOnly = phone.replace(/\D/g, "");
+    const isValidLocalMobile = numericOnly.length === 11 && numericOnly.startsWith("09");
+
+    if(!isValidLocalMobile) {
+        alert("Invalid Mobile Number! It must be exactly 11 digits and start with 09.");
+        return;
+    }
+
+    let age = parseInt(ageInput, 10);
+    if(isNaN(age) || age < 16) {
+        alert("Access denied! Minimum age is 16.");
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    if(users[email]){
+        alert("An account with this email address already exists!");
+        return;
+    }
+
+    users[email] = { name, phone: numericOnly, age, pass, role: "customer" };
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Account created successfully!");
+    showLogin();
+}
+
+function login(){
+    let email = document.getElementById("loginEmail").value.trim();
+    let pass = document.getElementById("loginPassword").value;
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+
+    if(users[email] && users[email].pass === pass){
+        localStorage.setItem("user", email);
+        updateUI();
+        closeModal();
+        alert(`Welcome back, ${users[email].name}!`);
+    } else {
+        alert("Invalid email credentials or password mismatch!");
+    }
+}
+
+function logout(){
+    localStorage.removeItem("user");
+    updateUI();
+    alert("Logged out successfully!");
+}
+
+function updateUI(){
+    const currentUser = getActiveUserData();
+    if(currentUser){
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        userText.style.display = "inline-block";
+        userText.innerHTML = (currentUser.role === "admin" ? "🛠️ " : "🟢 ") + currentUser.name;
+        
+        // Dynamic visibility adjustments
+        statusBtn.style.display = "inline-block"; // Both Customers and Admins can view Status
+        
+        if(currentUser.role === "admin") {
+            adminSysBtn.style.display = "inline-block";
+        } else {
+            adminSysBtn.style.display = "none";
+        }
+
+        profName.innerText = currentUser.name || "N/A";
+        profEmail.innerText = currentUser.email;
+        profPhone.innerText = currentUser.phone || "N/A";
+        profAge.innerText = currentUser.age ? currentUser.age + " years old" : "N/A";
+    } else {
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+        adminSysBtn.style.display = "none";
+        statusBtn.style.display = "none";
+        userText.style.display = "none";
+    }
+}
+document.addEventListener("DOMContentLoaded", updateUI);
+</script>
+</body>
+</html>

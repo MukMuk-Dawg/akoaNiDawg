@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sip & Chill Menu</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --black:#111;
+    --beige:#F5F0E8;
+    --accent:#C8B6A6;
+    --card-bg:#ffffff;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background: linear-gradient(-45deg,#F5F0E8,#efe3d6,#f5f0e8,#e9dccb);
+    background-size: 400% 400%;
+    animation: bgMove 15s ease infinite;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* CUSTOM SCROLLBAR FOR ENTERTAINMENT */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--beige);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--black);
+    border-radius: 10px;
+}
+
+/* NAV */
+nav{
+    background:var(--black);
+    padding:18px 8%;
+    color:var(--beige);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+
+.logo{
+    font-weight: 700; 
+    font-size: 22px; 
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#userText {
+    color: var(--beige);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+}
+
+nav a.nav-link {
+    color:var(--beige);
+    text-decoration:none;
+    font-weight: 500;
+    transition: transform 0.2s, color 0.2s;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+nav a.nav-link:hover {
+    color: #fff;
+    transform: translateX(-3px);
+}
+
+.status-btn {
+    background: transparent;
+    color: var(--beige);
+    border: 1px solid var(--beige);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.status-btn:hover {
+    background: var(--beige);
+    color: var(--black);
+}
+
+/* HEADER WITH ANIMATION */
+.header{
+    text-align:center;
+    padding:60px 20px 20px;
+}
+
+.header h1{
+    font-size:45px;
+    animation: fadeInDown 0.8s ease forwards;
+    color: var(--black);
+}
+
+.header p{
+    font-size: 16px;
+    color: #555;
+    animation: fadeInUp 0.8s ease forwards 0.2s;
+    opacity: 0;
+}
+
+/* CATEGORY FILTER BAR */
+.filter-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px 30px;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.8s ease forwards 0.3s;
+    opacity: 0;
+}
+
+.filter-btn {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--black);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+.filter-btn.active {
+    background: var(--black);
+    color: var(--beige);
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    border-color: var(--black);
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION TITLE */
+.section-title{
+    padding:0 8%;
+    margin-top:40px;
+    font-size:28px;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    transition: all 0.4s ease;
+}
+
+.section-title::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, var(--black), transparent);
+    opacity: 0.2;
+}
+
+/* MENU GRID */
+.container{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:25px;
+    padding:25px 8% 40px;
+    transition: all 0.4s ease;
+}
+
+/* ENHANCED ANIMATED CARD */
+.card{
+    background: var(--card-bg);
+    padding:18px;
+    border-radius:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,.04);
+    text-align:center;
+    transition: all .4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.6);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,.12);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-25deg);
+    transition: 0.75s;
+}
+.card:hover::before {
+    left: 125%;
+}
+
+.card img{
+    width:100%;
+    height:190px;
+    object-fit:cover;
+    border-radius:15px;
+    margin-bottom:12px;
+    transition: transform 0.5s ease;
+}
+.card:hover img {
+    transform: scale(1.03);
+}
+
+.card h3{
+    margin-bottom:8px;
+    font-size: 18px;
+    color: var(--black);
+}
+
+.price{
+    font-weight:700;
+    color:var(--black);
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+/* SHINY INTERACTIVE BUTTONS */
+.btn{
+    margin-top:auto;
+    display:inline-block;
+    padding:10px 20px;
+    background:var(--black);
+    color:var(--beige);
+    border:none;
+    border-radius:25px;
+    cursor:pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn:hover{
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+.btn:active{
+    transform: translateY(0);
+}
+
+/* FLOATING CART BUTTON WITH PULSE EFFECT */
+.floating-cart-trigger {
+    position:fixed;
+    bottom:25px;
+    right:25px;
+    background:var(--black);
+    color:#fff;
+    border:none;
+    width: 60px;
+    height: 60px;
+    border-radius:50%;
+    cursor:pointer;
+    z-index:997;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.floating-cart-trigger:hover {
+    transform: scale(1.1);
+}
+.cart-badge {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    background: #ff4757;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 10px;
+    animation: pulseBadge 2s infinite;
+}
+@keyframes pulseBadge {
+    0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(255, 71, 87, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
+
+/* SLIDE OUT SLICK CART WINDOW */
+.cart{
+    position:fixed;
+    right:-105%;
+    top:0;
+    width: 100%;
+    max-width:360px;
+    height:100%;
+    background:#fff;
+    box-shadow:-8px 0 35px rgba(0,0,0,.15);
+    padding:25px 20px;
+    transition: right .35s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index:999;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart.active{ right:0; }
+
+.cart h2 {
+    font-size: 24px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
+    margin-bottom: 10px;
+}
+
+/* Set up dynamic visual constraints for scroll control */
+#cartItems {
+    flex: 1;
+}
+
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    display:none;
+    z-index:998;
+    backdrop-filter: blur(3px);
+    transition: all 0.3s;
+}
+
+.overlay.active{ display:block; }
+
+/* CART ITEM ANIMATION HOVER */
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:12px 0;
+    border-bottom: 1px solid #f7f7f7;
+    padding-bottom: 12px;
+    animation: fadeInItem 0.3s ease;
+}
+@keyframes fadeInItem {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.qty{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.qty button{
+    width:26px;
+    height:26px;
+    border:none;
+    background:var(--black);
+    color:#fff;
+    border-radius:50%;
+    cursor:pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+.qty button:hover {
+    background: #444;
+    transform: scale(1.1);
+}
+
+/* DELIVER PICKUP INTERACTIVE TOGGLES */
+.order-method-section {
+    margin-top: 15px;
+    padding: 15px;
+    background: #faf8f5;
+    border-radius: 12px;
+    border: 1px dashed var(--accent);
+}
+
+.method-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.method-options label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid #eee;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.method-options input[type="radio"] {
+    display: none;
+}
+
+.method-options label.selected-method {
+    border-color: var(--black);
+    background: var(--black);
+    color: var(--beige);
+}
+
+.fee-display {
+    font-size: 12px;
+    color: #777;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.total{
+    margin-top: 20px;
+    font-weight:700;
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    border-top: 2px solid #eee;
+    padding-top: 12px;
+}
+
+/* GLASSMORPHISM OPTION MODAL */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.85);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    z-index: 1001;
+    width: 90%;
+    max-width: 410px;
+    display: none;
+    opacity: 0;
+    transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal.active {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+.modal h3 {
+    margin-bottom: 18px;
+    font-size: 22px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+}
+.modal label {
+    display: block;
+    margin: 14px 0 6px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #444;
+}
+.modal select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 2px solid #eee;
+    font-family: inherit;
+    background: white;
+    outline: none;
+    font-size: 14px;
+    transition: border 0.2s;
+}
+.modal select:focus {
+    border-color: var(--black);
+}
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+/* SUCCESS TOAST POPUP FOR FEEDBACK */
+.toast {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #2ed573;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: 500;
+    box-shadow: 0 5px 15px rgba(46, 213, 115, 0.4);
+    z-index: 2000;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* --- RESPONSIVE MEDIA BREAKPOINTS --- */
+
+@media (max-width: 1024px) {
+    .container {
+        grid-template-columns: repeat(3, 1fr);
+        padding: 25px 5% 40px;
+    }
+    .section-title {
+        padding: 0 5%;
+    }
+}
+
+@media (max-width: 768px) {
+    nav {
+        padding: 15px 5%;
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    .nav-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .header h1 {
+        font-size: 38px;
+    }
+    .section-title {
+        font-size: 24px;
+        margin-top: 35px;
+    }
+    .container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .card img {
+        height: 170px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 30px;
+    }
+    .header p {
+        font-size: 14px;
+    }
+    .section-title {
+        font-size: 20px;
+    }
+    .container {
+        grid-template-columns: 1fr;
+        padding: 20px 20px 40px;
+        gap: 25px;
+    }
+    .card img {
+        height: 200px;
+    }
+    .modal {
+        padding: 20px 15px;
+    }
+    .modal h3 {
+        font-size: 18px;
+    }
+    .cart {
+        max-width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">Sip & Chill ☕</div>
+    <div class="nav-actions">
+        <span id="userText" style="display: none;"></span>
+        <span id="userLocation" style="display: none; font-size: 12px; color: #FFD700; margin: 0 8px; padding: 4px 10px; background: rgba(0, 0, 0, 0.3); border-radius: 10px;"></span>
+        <a href="admin.html" id="adminSysBtn" class="status-btn" style="display: none;">🛠️ Admin System</a>
+        <a href="index.html" class="nav-link">← Back Home</a>
+    </div>
+</nav>
+
+<div class="header">
+    <h1>Our Menu</h1>
+    <p>Fresh Drinks, Desserts & Foods</p>
+</div>
+
+<!-- CATEGORY FILTER BAR -->
+<div class="filter-bar">
+    <button class="filter-btn active" onclick="filterCategory('all', this)">✨ Show All</button>
+    <button class="filter-btn" onclick="filterCategory('drinks', this)">🥤 Drinks</button>
+    <button class="filter-btn" onclick="filterCategory('desserts', this)">🍰 Desserts</button>
+    <button class="filter-btn" onclick="filterCategory('foods', this)">🍔 Foods</button>
+</div>
+
+<!-- DRINKS SECTION -->
+<div class="menu-group" id="cat-drinks">
+    <h2 class="section-title">🥤 Drinks</h2>
+    <div class="container">
+        <div class="card">
+            <img src="https://i.pinimg.com/736x/5e/93/29/5e9329c7b9e5e6f1fb7c419e4010c368.jpg" alt="Milk Tea">
+            <h3>Classic Milk Tea</h3>
+            <p class="price">From ₱49</p>
+            <button class="btn" onclick="openOptions('Classic Milk Tea', 49, ['Classic', 'Wintermelon', 'Okinawa', 'Matcha'], 'drink')">Choose Options</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/736x/08/ac/a6/08aca67cdac5b3e1ee701b896ea7a0e7.jpg" alt="Brown Sugar Milk Tea">
+            <h3>Brown Sugar Milk Tea</h3>
+            <p class="price">From ₱59</p>
+            <button class="btn" onclick="openOptions('Brown Sugar Milk Tea', 59, ['Original Brown Sugar', 'Cream Cheese BS'], 'drink')">Choose Options</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/1200x/75/c4/5e/75c45e402c275d578b7ba7c3dd2dc283.jpg" alt="Iced Coffee">
+            <h3>Iced Coffee</h3>
+            <p class="price">From ₱45</p>
+            <button class="btn" onclick="openOptions('Iced Coffee', 45, ['Caramel Macchiato', 'Vanilla Latte', 'Americano', 'Mocha'], 'drink')">Choose Options</button>
+        </div>
+        
+        <div class="card">
+            <img src="https://i.pinimg.com/1200x/32/4c/a7/324ca7e20170a9f34b41e3d2a5fc74b1.jpg" alt="Smoothie">
+            <h3>Smoothie</h3>
+            <p class="price">From ₱65</p>
+            <button class="btn" onclick="openOptions('Smoothie', 65, ['Pure Mango', 'Mango Graham', 'Mango Cheese', 'Strawberry Freeze', 'Avocado Dream', 'Blueberry Blast'], 'drink')">Choose Options</button>
+        </div>
+    </div>
+</div>
+
+<!-- DESSERTS SECTION -->
+<div class="menu-group" id="cat-desserts">
+    <h2 class="section-title">🍰 Desserts</h2>
+    <div class="container">
+        <div class="card">
+            <img src="https://i.pinimg.com/1200x/33/24/ea/3324ea27478420f7a7431489424c8f9a.jpg" alt="Chocolate Cake">
+            <h3>Chocolate Cake</h3>
+            <p class="price">₱70</p>
+            <button class="btn" onclick="addWithFeedback('Chocolate Cake', 70)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/736x/68/ca/1f/68ca1f8e34d9c3152c55179528d850f7.jpg" alt="Cheesecake">
+            <h3>Cheesecake</h3>
+            <p class="price">₱75</p>
+            <button class="btn" onclick="addWithFeedback('Cheesecake', 75)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/1200x/a8/b3/fb/a8b3fb5010197eecd0a9b94ba90434fd.jpg" alt="Ice Cream Sundae">
+            <h3>Ice Cream Sundae</h3>
+            <p class="price">₱60</p>
+            <button class="btn" onclick="addWithFeedback('Ice Cream Sundae', 60)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/bg/red-velvet-cake.jpg" onerror="this.src='https://www.simplytrinicooking.com/wp-content/uploads/red-velvet-cake.jpg'" alt="Red Velvet Cake">
+            <h3>Red Velvet Cake</h3>
+            <p class="price">₱80</p>
+            <button class="btn" onclick="addWithFeedback('Red Velvet Cake', 80)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://www.foodgal.com/wp-content/uploads/2022/03/Matcha-chocolate-lava-cake-cut.jpg" alt="Matcha Lava Cake">
+            <h3>Matcha Lava Cake</h3>
+            <p class="price">₱85</p>
+            <button class="btn" onclick="addWithFeedback('Matcha Lava Cake', 85)">Add to Cart</button>
+        </div>
+
+        <div class="card">
+            <img src="https://www.twistandmake.com/hs-fs/hubfs/twist-and-make-images/New-Twist-and-Make-Recipes/640-Images/170-cream-cheese-mango-float-eden.jpg?width=640&height=640&name=170-cream-cheese-mango-float-eden.jpg" alt="Mango Graham Float">
+            <h3>Mango Graham Float</h3>
+            <p class="price">₱65</p>
+            <button class="btn" onclick="addWithFeedback('Mango Graham Float', 65)">Add to Cart</button>
+        </div>
+    </div>
+</div>
+
+<!-- FOODS SECTION -->
+<div class="menu-group" id="cat-foods">
+    <h2 class="section-title">🍔 Foods</h2>
+    <div class="container">
+        <div class="card">
+            <img src="https://i.pinimg.com/1200x/e8/95/f2/e895f290df01ee238630e8dd77cab76d.jpg" alt="Burger">
+            <h3>Cheeseburger</h3>
+            <p class="price">From ₱85</p>
+            <button class="btn" onclick="openOptions('Cheeseburger', 85, ['Classic Cheese', 'Bacon Mushroom', 'Spicy Jalapeño', 'BBQ Quarter Pounder'], 'burger')">Choose Options</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/736x/66/de/7f/66de7fc8746f94556369bfaace774aba.jpg" alt="Chicken Sandwich">
+            <h3>Chicken Sandwich</h3>
+            <p class="price">From ₱90</p>
+            <button class="btn" onclick="openOptions('Chicken Sandwich', 90, ['Crispy Fillet', 'Spicy Buffalo Style', 'Honey Mustard Grilled'], 'sandwich')">Choose Options</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/736x/51/30/2e/51302ec5fbd95944281940debf39e79b.jpg" alt="Fries">
+            <h3>French Fries</h3>
+            <p class="price">From ₱50</p>
+            <button class="btn" onclick="openOptions('French Fries', 50, ['Salted Classic', 'Cheese Powder', 'Sour Cream', 'Barbecue BBQ'], 'fries')">Choose Options</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/1200x/fc/eb/7b/fceb7b50fdc0c3832c6d4e31d2bf1bbf.jpg" alt="Hotdog Meal">
+            <h3>Hotdog Meal</h3>
+            <p class="price">From ₱80</p>
+            <button class="btn" onclick="openOptions('Hotdog Meal', 80, ['Classic Ketchup-Mayo', 'Cheesy Coney Style', 'Chili Peppers Spark'], 'hotdog')">Choose Options</button>
+        </div>
+
+        <div class="card">
+            <img src="https://i.pinimg.com/736x/9d/ea/40/9dea403b069c79e5ea93c33ef14c89cd.jpg" alt="Chicken Rice Meal">
+            <h3>Chicken Rice Meal</h3>
+            <p class="price">From ₱99</p>
+            <button class="btn" onclick="openOptions('Chicken Rice Meal', 99, ['1pc Soy Garlic Fried', '1pc Spicy Glazed', '2pc Crispy Gravy Side (+₱45)'], 'chicken')">Choose Options</button>
+        </div>
+    </div>
+</div>
+
+<!-- FLOATING CART FLOATER LINK -->
+<button class="floating-cart-trigger" onclick="openCart()">
+    🛒 <span class="cart-badge" id="cartCounter">0</span>
+</button>
+
+<!-- OPTION MODAL STYLES -->
+<div class="modal" id="optionsModal">
+    <h3 id="modalItemName">Select Options</h3>
+    
+    <label id="flavorLabel" for="flavorSelect">Flavor / Style:</label>
+    <select id="flavorSelect" onchange="updateModalPrice()"></select>
+
+    <label id="sizeLabel" for="sizeSelect">Size / Upgrade:</label>
+    <select id="sizeSelect" onchange="updateModalPrice()">
+        <option value="Medium" data-add="0">Regular / Medium (Base Price)</option>
+        <option value="Large" data-add="15">Large Upgrade (+₱15)</option>
+    </select>
+
+    <div style="margin-top: 18px; font-weight: 700; font-size: 16px; color: var(--black);" id="modalPriceDisplay">Price: ₱0</div>
+
+    <div class="modal-actions">
+        <button class="btn" style="background:#eee; color:#111; box-shadow:none;" onclick="closeOptions()">Cancel</button>
+        <button class="btn" id="modalAddBtn">Add to Cart</button>
+    </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- CART INTERACTION PANEL -->
+<div class="cart" id="cart">
+    <h2>🛒 Cart</h2>
+    <div id="cartItems"></div>
+    
+    <div class="order-method-section">
+        <b style="font-size: 14px; color: #222;">How do you want your order?</b>
+        <div class="method-options">
+            <label id="lblPickup" class="selected-method">
+                <input type="radio" name="orderMethod" value="pickup" checked onchange="changeMethod('pickup')">
+                🏃 Pickup
+            </label>
+            <label id="lblDelivery">
+                <input type="radio" name="orderMethod" value="delivery" onchange="changeMethod('delivery')">
+                🛵 Delivery
+            </label>
+        </div>
+        <div id="feeDisplay" class="fee-display">Delivery Fee: ₱0</div>
+    </div>
+
+    <div class="total">
+        <span>Grand Total:</span>
+        <span id="total" style="color: var(--black);">₱0</span>
+    </div>
+
+    <a href="checkout.html" style="text-decoration:none;">
+        <button class="btn" style="width:100%;margin-top:15px;padding:12px;font-size:15px;">Proceed To Checkout</button>
+    </a>
+</div>
+
+<!-- TOAST ALERT ELEMENT -->
+<div class="toast" id="toast">✨ Added item to cart!</div>
+
+<script>
+let currentItem = {};
+const DELIVERY_FEE = 50; 
+
+// Dynamic Categories Filtering Engine
+function filterCategory(category, element) {
+    // 1. Manage Active Button Styling Status Toggle
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+
+    // 2. Select All Target Section Item Modules
+    const menuGroups = document.querySelectorAll('.menu-group');
+    
+    menuGroups.forEach(group => {
+        if (category === 'all') {
+            group.style.display = 'block';
+        } else {
+            if (group.id === `cat-${category}`) {
+                group.style.display = 'block';
+            } else {
+                group.style.display = 'none';
+            }
+        }
+    });
+}
+
+function getCart(){
+    return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function saveCart(cart){
+    localStorage.setItem("cart",JSON.stringify(cart));
+    updateCartCounter();
+}
+
+function getOrderMethod(){
+    return localStorage.getItem("orderMethod") || "pickup";
+}
+
+function changeMethod(method){
+    localStorage.setItem("orderMethod", method);
+    
+    document.getElementById("lblPickup").classList.remove("selected-method");
+    document.getElementById("lblDelivery").classList.remove("selected-method");
+    if(method === "pickup") {
+        document.getElementById("lblPickup").classList.add("selected-method");
+    } else {
+        document.getElementById("lblDelivery").classList.add("selected-method");
+    }
+    
+    render();
+}
+
+function updateCartCounter(){
+    let cart = getCart();
+    let totalItems = cart.reduce((acc, current) => acc + current.qty, 0);
+    document.getElementById("cartCounter").innerText = totalItems;
+}
+
+function showToast(message) {
+    let toast = document.getElementById("toast");
+    toast.innerHTML = `✨ ${message}`;
+    toast.classList.add("show");
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2000);
+}
+
+// Open modal for options (Dynamic for Drinks or Foods types)
+function openOptions(name, basePrice, flavors, categoryType = 'drink'){
+    currentItem = { name, basePrice, categoryType };
+    
+    document.getElementById("modalItemName").innerText = name;
+    
+    // Adjust layout labeling contextual properties based on category mapping
+    const flavorLabel = document.getElementById("flavorLabel");
+    const sizeLabel = document.getElementById("sizeLabel");
+    const sizeSelect = document.getElementById("sizeSelect");
+
+    if (categoryType === 'drink') {
+        flavorLabel.innerText = "Flavor Option:";
+        sizeLabel.innerText = "Size Sizing:";
+        sizeSelect.innerHTML = `
+            <option value="Medium" data-add="0">Medium (Base Price)</option>
+            <option value="Large" data-add="15">Large (+₱15)</option>
+        `;
+    } else if (categoryType === 'burger' || categoryType === 'sandwich') {
+        flavorLabel.innerText = "Choose Variant / Build:";
+        sizeLabel.innerText = "Add-ons Option Setup:";
+        sizeSelect.innerHTML = `
+            <option value="Solo Ala Carte" data-add="0">Solo Ala Carte (Base)</option>
+            <option value="With Crisp Fries" data-add="30">Add Extra French Fries (+₱30)</option>
+            <option value="Combo Meal Set" data-add="45">Make it a Full Combo Meal (+₱45)</option>
+        `;
+    } else if (categoryType === 'fries') {
+        flavorLabel.innerText = "Choose Flavor Shaker Dust:";
+        sizeLabel.innerText = "Portion Sizing Setup:";
+        sizeSelect.innerHTML = `
+            <option value="Regular Snack" data-add="0">Regular Snack Size (Base)</option>
+            <option value="Sharing Basket" data-add="25">Sharing Large Basket (+₱25)</option>
+            <option value="Giga Bucket" data-add="45">Giga Party Bucket (+₱45)</option>
+        `;
+    } else {
+        // Fallback default format configuration for other generic items
+        flavorLabel.innerText = "Select Flavor Preference:";
+        sizeLabel.innerText = "Portion Additions Option:";
+        sizeSelect.innerHTML = `
+            <option value="Standard Serving" data-add="0">Standard Serving (Base)</option>
+            <option value="Double Upgrade" data-add="40">Double the Portion (+₱40)</option>
+        `;
+    }
+    
+    let flavorSelect = document.getElementById("flavorSelect");
+    flavorSelect.innerHTML = "";
+    flavors.forEach(flavor => {
+        // Track unique values in string context arrays inside select list values
+        let extraCost = 0;
+        if(flavor.includes("+₱45")) extraCost = 45;
+        flavorSelect.innerHTML += `<option value="${flavor}" data-item-add="${extraCost}">${flavor}</option>`;
+    });
+
+    sizeSelect.selectedIndex = 0;
+    updateModalPrice();
+    
+    document.getElementById("optionsModal").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+
+    document.getElementById("modalAddBtn").onclick = function() {
+        let selectedFlavor = document.getElementById("flavorSelect").value;
+        let selectedSize = document.getElementById("sizeSelect").value;
+        
+        let sizeElement = document.getElementById("sizeSelect");
+        let flavorElement = document.getElementById("flavorSelect");
+        
+        let extraSizePrice = parseFloat(sizeElement.options[sizeElement.selectedIndex].getAttribute("data-add")) || 0;
+        let extraFlavorPrice = parseFloat(flavorElement.options[flavorElement.selectedIndex].getAttribute("data-item-add")) || 0;
+        
+        let finalPrice = currentItem.basePrice + extraSizePrice + extraFlavorPrice;
+
+        add(currentItem.name, finalPrice, selectedFlavor, selectedSize);
+        closeOptions();
+        showToast(`${currentItem.name} added!`);
+    };
+}
+
+function updateModalPrice() {
+    let sizeElement = document.getElementById("sizeSelect");
+    let flavorElement = document.getElementById("flavorSelect");
+    
+    let extraSizePrice = 0;
+    if(sizeElement && sizeElement.selectedIndex >= 0) {
+        extraSizePrice = parseFloat(sizeElement.options[sizeElement.selectedIndex].getAttribute("data-add")) || 0;
+    }
+    
+    let extraFlavorPrice = 0;
+    if(flavorElement && flavorElement.selectedIndex >= 0) {
+        extraFlavorPrice = parseFloat(flavorElement.options[flavorElement.selectedIndex].getAttribute("data-item-add")) || 0;
+    }
+    
+    let finalPrice = currentItem.basePrice + extraSizePrice + extraFlavorPrice;
+    document.getElementById("modalPriceDisplay").innerText = "Price: ₱" + finalPrice;
+}
+
+function closeOptions(){
+    document.getElementById("optionsModal").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
+
+function closeAll(){
+    closeCart();
+    closeOptions();
+}
+
+function add(name, price, flavor = null, size = null){
+    let cart = getCart();
+    let item = cart.find(i => i.name === name && i.flavor === flavor && i.size === size);
+
+    if(item) {
+        item.qty++;
+    } else {
+        cart.push({name, price, qty:1, flavor, size});
+    }
+
+    saveCart(cart);
+    render();
+}
+
+function addWithFeedback(name, price) {
+    add(name, price);
+    showToast(`${name} added to cart!`);
+}
+
+function minus(name, flavor, size){
+    let cart = getCart();
+    let item = cart.find(i => i.name === name && i.flavor === flavor && i.size === size);
+
+    if(item){
+        item.qty--;
+        if(item.qty <= 0){
+            cart = cart.filter(i => !(i.name === name && i.flavor === flavor && i.size === size));
+        }
+    }
+
+    saveCart(cart);
+    render();
+}
+
+function render(){
+    let cart = getCart();
+    let box = document.getElementById("cartItems");
+    let itemsTotal = 0;
+
+    box.innerHTML = "";
+
+    if(cart.length === 0){
+        box.innerHTML = `<div style="text-align:center;color:#aaa;padding:40px 0;font-size:14px;">Your cart is empty ☕</div>`;
+    }
+
+    cart.forEach(item=>{
+        itemsTotal += item.price * item.qty;
+        
+        let details = "";
+        if (item.flavor || item.size) {
+            details = `<span style="font-size:11px; color:#888; font-weight:500;">(${item.size} • ${item.flavor})</span><br>`;
+        }
+
+        let itemFlavorEscaped = item.flavor ? item.flavor.replace(/'/g, "\\'") : null;
+        let itemSizeEscaped = item.size ? item.size.replace(/'/g, "\\'") : null;
+
+        box.innerHTML += `
+        <div class="item">
+            <div style="padding-right:10px;">
+                <b style="font-size:14px; color:var(--black);">${item.name}</b><br>
+                ${details}
+                <span style="color:#666; font-size:13px; font-weight:600;">₱${item.price}</span>
+            </div>
+
+            <div class="qty">
+                <button onclick="minus('${item.name.replace(/'/g, "\\'")}', '${itemFlavorEscaped}', '${itemSizeEscaped}')">-</button>
+                <span style="font-weight:600; font-size:14px; min-width:15px; text-align:center;">${item.qty}</span>
+                <button onclick="add('${item.name.replace(/'/g, "\\'")}', ${item.price}, '${itemFlavorEscaped}', '${itemSizeEscaped}')">+</button>
+            </div>
+        </div>`;
+    });
+
+    let currentMethod = getOrderMethod();
+    let fee = currentMethod === "delivery" ? DELIVERY_FEE : 0;
+    
+    const targetRadio = document.querySelector(`input[name="orderMethod"][value="${currentMethod}"]`);
+    if(targetRadio) targetRadio.checked = true;
+    
+    document.getElementById("lblPickup").classList.remove("selected-method");
+    document.getElementById("lblDelivery").classList.remove("selected-method");
+    if(currentMethod === "pickup") {
+        document.getElementById("lblPickup").classList.add("selected-method");
+    } else {
+        document.getElementById("lblDelivery").classList.add("selected-method");
+    }
+    
+    document.getElementById("feeDisplay").innerText = "Delivery Fee: ₱" + fee;
+
+    let grandTotal = itemsTotal > 0 ? (itemsTotal + fee) : 0;
+    document.getElementById("total").innerText = "₱" + grandTotal;
+}
+
+function openCart(){
+    document.getElementById("cart").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+    render();
+}
+
+function closeCart(){
+    document.getElementById("cart").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
+
+function updateMenuNavbarUI(){
+    let user = localStorage.getItem("user");
+    let users = JSON.parse(localStorage.getItem("users")) || {};
+    let userText = document.getElementById("userText");
+    let userLocation = document.getElementById("userLocation");
+    let adminBtn = document.getElementById("adminSysBtn");
+
+    if(user && users[user]){
+        userText.style.display = "inline-block";
+        // show admin badge in name if admin
+        userText.innerHTML = (users[user].role === 'admin' ? '🛠️ ' : '🟢 ') + users[user].name;
+        // Show admin button only for admin role
+        if (users[user].role === 'admin') {
+            adminBtn.style.display = "inline-block";
+        } else {
+            adminBtn.style.display = "none";
+        }
+        
+        // Display barangay/location if available
+        if(users[user].address){
+            userLocation.style.display = "inline-block";
+            // Parse address to show barangay
+            const addressParts = users[user].address.split(',');
+            if(addressParts.length === 2){
+                userLocation.innerHTML = "📍 " + addressParts[1].trim();
+            } else {
+                userLocation.innerHTML = "📍 " + users[user].address;
+            }
+        }
+    } else {
+        userText.style.display = "none";
+        userLocation.style.display = "none";
+        adminBtn.style.display = "none";
+    }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    updateMenuNavbarUI();
+    updateCartCounter();
+    render();
+});
+</script>
+
+</body>
+</html>

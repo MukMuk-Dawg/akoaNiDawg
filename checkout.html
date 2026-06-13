@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - Sip & Chill</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<style>
+:root {
+    --black: #111;
+    --beige: #F5F0E8;
+    --accent: #C8B6A6;
+    --gray-bg: #FAF8F5;
+    --text-muted: #7A7570;
+    --success: #4CAF50;
+    --alert: #E65100;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(-45deg, #F5F0E8, #efe3d6, #f5f0e8, #e9dccb);
+    background-size: 400% 400%;
+    animation: bgShift 12s ease infinite;
+    padding: 0 0 40px 0;
+    color: var(--black);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+@keyframes bgShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--black);
+    border-radius: 10px;
+}
+
+nav {
+    background: var(--black);
+    padding: 18px 5%;
+    color: var(--beige);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav a {
+    color: var(--beige);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: transform 0.2s;
+}
+
+nav a:hover {
+    transform: translateX(-3px);
+}
+
+.checkout-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    letter-spacing: -0.5px;
+    animation: popInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.checkout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.summary-box {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 15px 35px rgba(17,17,17,0.04);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transform: translateY(20px);
+    opacity: 0;
+    animation: popInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+    height: fit-content;
+}
+
+@keyframes popInUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.summary-box h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding-bottom: 10px;
+}
+
+/* Container for interactive Leaflet Map */
+.map-box {
+    width: 100%;
+    height: 300px;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 24px;
+    border: 2px solid var(--beige);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+    z-index: 1;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    background: var(--gray-bg);
+}
+
+.map-instructions {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dynamic-fields-box {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--black);
+}
+
+.input-field {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--beige);
+    background: var(--gray-bg);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black);
+    outline: none;
+    transition: all 0.25s ease;
+    -webkit-appearance: none;
+}
+
+.input-field:focus {
+    border-color: var(--black);
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+#cartContainer {
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin: 14px 0;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed rgba(0,0,0,0.06);
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.item-main {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.cart-item-details {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-weight: 400;
+}
+
+.item-price {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.fee-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 8px 0;
+    padding: 4px 0;
+}
+
+.total-wrapper {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid var(--black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.total {
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.5px;
+}
+
+.btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--black);
+    color: var(--beige);
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(17,17,17,0.1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+    transform: translateY(15px);
+    animation: popInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    -webkit-tap-highlight-color: transparent;
+    margin-top: 12px;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(17,17,17,0.2);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0px);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+#notification {
+    display: none;
+    text-align: center;
+    padding: 14px;
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 15px;
+    border: 1px dashed #2E7D32;
+    animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes bounceIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+#receiptModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(17,17,17,0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#receiptModal.active {
+    display: flex;
+    opacity: 1;
+}
+
+#receiptContent {
+    background: #fff;
+    border-radius: 24px;
+    padding: 28px;
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+    transform: scale(0.85);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#receiptModal.active #receiptContent {
+    transform: scale(1);
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.receipt-icon {
+    font-size: 36px;
+    margin-bottom: 5px;
+    animation: bounceElement 2s infinite ease-in-out;
+}
+
+@keyframes bounceElement {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+#receiptContent h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.code-box {
+    background: var(--gray-bg);
+    border: 1px dashed var(--accent);
+    padding: 12px;
+    border-radius: 12px;
+    margin: 16px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.code-section {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.code-section:first-child {
+    border-right: 1px solid rgba(0,0,0,0.08);
+}
+
+.code-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.order-code, .type-display {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--black);
+    margin-top: 2px;
+}
+
+.receipt-meta-box {
+    background: var(--gray-bg);
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    border-left: 3px solid var(--black);
+}
+
+.receipt-meta-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+}
+
+#receiptItems {
+    text-align: left;
+    max-height: 160px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding-right: 4px;
+}
+
+#receiptContent .receipt-item {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f9f9f9;
+}
+
+#receiptContent .receipt-item-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+#receiptContent .receipt-item-details {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+#receiptContent .receipt-breakdown {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+#receiptContent .receipt-total {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 2px dashed #eee;
+    font-weight: 700;
+    font-size: 20px;
+    text-align: right;
+    margin-bottom: 20px;
+    color: var(--black);
+}
+
+#receiptContent .close-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--black);
+    color: var(--beige);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.confetti-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    top: -10px;
+    border-radius: 2px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    from { transform: translateY(0) rotate(0deg); opacity: 1; }
+    to { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+}
+
+.admin-section {
+    margin-top: 50px;
+    border-top: 3px double var(--black);
+    padding-top: 30px;
+}
+.admin-badge {
+    background: var(--black);
+    color: var(--beige);
+    padding: 4px 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+.admin-table-container {
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+    overflow-x: auto;
+}
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13.5px;
+}
+.admin-table th, .admin-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.admin-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+.status-pill {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.status-pending { background: #FFF3E0; color: #E65100; }
+.status-confirmed { background: #E8F5E9; color: #2E7D32; }
+.status-cancelled { background: #FFEBEE; color: #C62828; }
+
+.admin-actions select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    background: var(--gray-bg);
+    font-size: 12px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+}
+
+@media (min-width: 769px) {
+    .dynamic-fields-box {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1025px) {
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        align-items: start;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    nav { padding: 14px 16px; margin-bottom: 20px; }
+    nav div { font-size: 18px !important; }
+    nav a { font-size: 13px; }
+    h1 { font-size: 22px; margin-bottom: 15px; }
+    .summary-box { padding: 18px; border-radius: 16px; margin-bottom: 10px; }
+    .summary-box h3 { font-size: 15px; margin-bottom: 14px; }
+    .map-box { height: 220px; margin-top: 15px; }
+    .input-field { padding: 12px 14px; font-size: 13.5px; border-radius: 10px; }
+    .cart-item { margin: 12px 0; padding-bottom: 12px; gap: 10px; }
+    .item-main, .item-price { font-size: 13px; }
+    .total { font-size: 21px; }
+    .btn { padding: 14px; font-size: 14px; border-radius: 12px; }
+    #receiptContent { padding: 20px; border-radius: 20px; }
+    #receiptContent h2 { font-size: 18px; }
+    .order-code, .type-display { font-size: 14px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+    <div style="font-weight:700; font-size:22px;">Sip & Chill 🧋</div>
+    <a href="menu.html">← Back to Menu</a>
+</nav>
+
+<div class="checkout-wrapper">
+    <h1 id="checkoutTitle">Checkout</h1>
+
+    <div class="checkout-grid">
+        <div class="summary-box">
+            <h3>Order Summary</h3>
+            
+            <div id="cartContainer"></div>
+            
+            <div class="dynamic-fields-box" id="dynamicFieldsContainer"></div>
+            
+            <div id="mapSection">
+                <div class="map-box">
+                    <div id="map"></div>
+                </div>
+                <div class="map-instructions">📍 <span>Click anywhere on the map to pin your drop-off coordinates.</span></div>
+            </div>
+        </div>
+
+        <div class="summary-box" style="animation-delay: 0.2s;">
+            <h3>Payment Details</h3>
+            <div id="summaryCostBreakdown"></div>
+
+            <div class="total-wrapper">
+                <span class="total-label">Grand Total</span>
+                <div class="total" id="total">₱0</div>
+            </div>
+            
+            <button id="placeOrderBtn" class="btn" onclick="checkout()">Place Order</button>
+            <div id="notification">🎉 Success! Your drink path is being prepared! Waiting for admin confirmation.</div>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Live Order Management Terminal <span class="admin-badge">Admin System</span></h2>
+            <button onclick="clearAllOrdersLog()" style="background: transparent; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-decoration: underline;">Clear History</button>
+        </div>
+        <div class="admin-table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Order ID</th>
+                        <th>Type</th>
+                        <th>Customer / Destination</th>
+                        <th>Items Count</th>
+                        <th>Bill</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminOrderTableBody">
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 20px;">No incoming processing orders detected.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="receiptModal">
+    <div id="receiptContent">
+        <div class="receipt-header">
+            <div class="receipt-icon">🥳</div>
+            <h2>Order Confirmed!</h2>
+        </div>
+        
+        <div class="code-box">
+            <div class="code-section">
+                <div class="code-label">Order Code</div>
+                <div class="order-code" id="receiptCode">#SC-XXXX</div>
+            </div>
+            <div class="code-section">
+                <div class="code-label">Method</div>
+                <div class="type-display" id="receiptMethodType">Pickup</div>
+            </div>
+        </div>
+
+        <div class="receipt-meta-box" id="receiptCustomerMeta"></div>
+
+        <div id="receiptItems"></div>
+        <div id="receiptCostBreakdown" class="receipt-breakdown"></div>
+        <div class="receipt-total" id="receiptTotal"></div>
+        
+        <button class="close-btn" onclick="closeReceipt()">Close & Finish</button>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+const ZAMBOANGA_DISTRICT_ZONES = {
+    "Zone 1 (Poblacion)": { cost: 50, distance: "Core Zone (~3 km)" },
+    "Sta. Maria": { cost: 50, distance: "Core Zone (~4 km)" },
+    "Tetuan": { cost: 50, distance: "Core Zone (~4 km)" },
+    "Camino Nuevo": { cost: 50, distance: "Core Zone (~2 km)" },
+    "San Jose Gusu": { cost: 50, distance: "Core Zone (~5 km)" },
+    "Canelar": { cost: 50, distance: "Core Zone (~3 km)" },
+    "Guiwan": { cost: 90, distance: "Mid Zone (~7 km)" },
+    "Pasonanca": { cost: 90, distance: "Mid Zone (~8 km)" },
+    "Divisoria": { cost: 90, distance: "Mid Zone (~9 km)" },
+    "Putik": { cost: 90, distance: "Mid Zone (~8 km)" },
+    "Tugbungan": { cost: 90, distance: "Mid Zone (~6 km)" },
+    "Calarian": { cost: 90, distance: "Mid Zone (~7 km)" },
+    "Suterville": { cost: 90, distance: "Mid Zone (~6 km)" },
+    "Lunzuran": { cost: 90, distance: "Mid Zone (~10 km)" },
+    "Tumaga": { cost: 90, distance: "Mid Zone (~6 km)" }
+};
+
+let currentSubtotal = 0;
+let map, marker;
+const initialCenter = [6.9085, 122.0788]; // Zamboanga City Center Base
+
+function initLeafletMap() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement || map) return;
+
+    map = L.map('map').setView(initialCenter, 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    marker = L.marker(initialCenter, { draggable: true }).addTo(map);
+
+    map.on('click', function(e) {
+        const coords = e.latlng;
+        marker.setLatLng(coords);
+        reverseGeocodeAddress(coords.lat, coords.lng);
+    });
+
+    marker.on('dragend', function(e) {
+        const coords = marker.getLatLng();
+        reverseGeocodeAddress(coords.lat, coords.lng);
+    });
+}
+
+function reverseGeocodeAddress(lat, lng) {
+    const addressField = document.getElementById("custAddress");
+    const barangaySelect = document.getElementById("barangaySelect");
+    
+    if (addressField) {
+        addressField.value = `Loading pinned location info... (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+    }
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.display_name) {
+                const rawAddress = data.display_name;
+                
+                if (addressField) {
+                    addressField.value = `${rawAddress} [Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}]`;
+                }
+
+                if (barangaySelect) {
+                    for (const bgy in ZAMBOANGA_DISTRICT_ZONES) {
+                        if (rawAddress.toLowerCase().includes(bgy.toLowerCase())) {
+                            barangaySelect.value = bgy;
+                            updateDeliveryCalculations();
+                            break;
+                        }
+                    }
+                }
+            }
+        })
+        .catch(() => {
+            if (addressField) {
+                addressField.value = `Pinned Location Point: Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
+            }
+        });
+}
+
+function getCart(){ return JSON.parse(localStorage.getItem("cart")) || []; }
+function getOrderMethod(){ return localStorage.getItem("orderMethod") || "pickup"; }
+
+function getActiveUserData() {
+    const currentEmail = localStorage.getItem("user");
+    if (!currentEmail) return null;
+    const users = JSON.parse(localStorage.getItem("users")) || {};
+    const data = users[currentEmail];
+    return data ? { email: currentEmail, ...data } : null;
+}
+
+function generateOrderCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `#SC-${result}`;
+}
+
+function updateDeliveryCalculations() {
+    const barangaySelect = document.getElementById("barangaySelect");
+    if (!barangaySelect) return;
+    
+    const selectedBarangay = barangaySelect.value;
+    const feeInfo = ZAMBOANGA_DISTRICT_ZONES[selectedBarangay] || { cost: 0, distance: "" };
+    
+    if (selectedBarangay) {
+        document.getElementById("summaryCostBreakdown").innerHTML = `
+            <div class="fee-line"><span>Items Subtotal</span><span>₱${currentSubtotal}</span></div>
+            <div class="fee-line"><strong>Delivery Surcharge (${feeInfo.distance})</strong><strong>₱${feeInfo.cost}</strong></div>
+        `;
+        document.getElementById("total").innerText = "₱" + (currentSubtotal + feeInfo.cost);
+    } else {
+        document.getElementById("summaryCostBreakdown").innerHTML = `
+            <div class="fee-line"><span>Items Subtotal</span><span>₱${currentSubtotal}</span></div>
+            <div class="fee-line"><span style="color: #E65100; font-style: italic;">Choose a barangay to see pricing info</span><span>—</span></div>
+        `;
+        document.getElementById("total").innerText = "₱" + currentSubtotal;
+    }
+}
+
+function renderCheckoutPage() {
+    let rawCart = getCart();
+    const consolidatedCart = [];
+    rawCart.forEach(item => {
+        let match = consolidatedCart.find(c => 
+            c.name === item.name && 
+            c.size === item.size && 
+            c.flavor === item.flavor
+        );
+        if (match) { match.qty += item.qty; } else { consolidatedCart.push({ ...item }); }
+    });
+    
+    if (rawCart.length !== consolidatedCart.length) {
+        localStorage.setItem("cart", JSON.stringify(consolidatedCart));
+    }
+
+    const cart = consolidatedCart;
+    const container = document.getElementById("cartContainer");
+    const dynamicContainer = document.getElementById("dynamicFieldsContainer");
+    const method = getOrderMethod();
+    const orderBtn = document.getElementById("placeOrderBtn");
+    const userData = getActiveUserData();
+    
+    currentSubtotal = 0;
+    container.innerHTML = "";
+
+    document.getElementById("checkoutTitle").innerText = method === "delivery" ? "Checkout (Delivery)" : "Checkout (Store Pickup)";
+
+    if(cart.length === 0){
+        container.innerHTML = "<p style='text-align:center;margin:20px 0;font-weight:600;color:var(--text-muted);'>Your cart is empty!</p>";
+        if(orderBtn) orderBtn.disabled = true;
+        document.getElementById("mapSection").style.display = "none";
+        renderAdminDashboard();
+        return;
+    }
+
+    cart.forEach(item=>{
+        currentSubtotal += item.price * item.qty;
+        let details = (item.flavor || item.size) ? `<div class="cart-item-details">${item.size} — ${item.flavor}</div>` : '';
+        
+        container.innerHTML += `
+        <div class="cart-item">
+            <div>
+                <div class="item-main">${item.name} <span style="font-weight:400; color:var(--text-muted)">x${item.qty}</span></div>
+                ${details}
+            </div>
+            <div class="item-price">₱${item.price * item.qty}</div>
+        </div>`;
+    });
+
+    if (method === "delivery") {
+        document.getElementById("mapSection").style.display = "block";
+        let barangayOptionsHtml = '<option value="" disabled selected>— Select Barangay —</option>';
+        for (const barangay in ZAMBOANGA_DISTRICT_ZONES) {
+            const info = ZAMBOANGA_DISTRICT_ZONES[barangay];
+            barangayOptionsHtml += `<option value="${barangay}">${barangay} (₱${info.cost})</option>`;
+        }
+
+        let prefillName = userData ? userData.name : "";
+        let prefillPhone = userData ? userData.phone : "";
+        let prefillStreet = "";
+        let prefillBarangay = "";
+        
+        if (userData && userData.address) {
+            const fullAddress = userData.address;
+            const validBarangays = Object.keys(ZAMBOANGA_DISTRICT_ZONES);
+            let matchedBarangay = validBarangays.find(b => fullAddress.toLowerCase().includes(b.toLowerCase()));
+            
+            if (matchedBarangay) {
+                prefillBarangay = matchedBarangay;
+                let cleanStreet = fullAddress.replace(new RegExp(matchedBarangay, 'gi'), '');
+                prefillStreet = cleanStreet.replace(/^,|,$/g, '').trim();
+            } else {
+                const addressParts = fullAddress.split(',');
+                if (addressParts.length >= 2) {
+                    prefillStreet = addressParts[0].trim();
+                    prefillBarangay = addressParts[1].trim();
+                } else { prefillStreet = fullAddress; }
+            }
+        }
+
+        dynamicContainer.innerHTML = `
+            <div class="form-group">
+                <label for="custName">Full Name</label>
+                <input type="text" id="custName" class="input-field" placeholder="Enter your full name" value="${prefillName}">
+            </div>
+            <div class="form-group">
+                <label for="custPhone">Contact Number (11 Digits)</label>
+                <input type="text" id="custPhone" class="input-field" placeholder="e.g. 09123456789" value="${prefillPhone}" maxlength="11">
+            </div>
+            <div class="form-group full-width">
+                <label for="barangaySelect">Barangay Location</label>
+                <select id="barangaySelect" class="input-field" onchange="updateDeliveryCalculations()">
+                    ${barangayOptionsHtml}
+                </select>
+            </div>
+            <div class="form-group full-width">
+                <label for="custAddress">Street Address / Landmark (Or click map point below)</label>
+                <input type="text" id="custAddress" class="input-field" placeholder="House No., Street, Landmarks" value="${prefillStreet}">
+            </div>
+        `;
+        
+        setTimeout(() => {
+            const barangaySelect = document.getElementById("barangaySelect");
+            if (barangaySelect && prefillBarangay) {
+                const exactMatch = Object.keys(ZAMBOANGA_DISTRICT_ZONES).find(b => b.toLowerCase() === prefillBarangay.toLowerCase());
+                if (exactMatch) {
+                    barangaySelect.value = exactMatch;
+                    updateDeliveryCalculations();
+                }
+            }
+            initLeafletMap();
+        }, 50);
+        
+    } else {
+        // Hides map for pickup and displays branch choices
+        document.getElementById("mapSection").style.display = "none";
+        let prefillName = userData ? userData.name : "";
+        
+        dynamicContainer.innerHTML = `
+            <div class="form-group full-width">
+                <label for="custName">Pickup Customer Name</label>
+                <input type="text" id="custName" class="input-field" placeholder="Who will pick up this order?" value="${prefillName}">
+            </div>
+            <div class="form-group full-width">
+                <label for="branchSelect">Select Branch Location</label>
+                <select id="branchSelect" class="input-field">
+                    <option value="Tumaga Branch 🏪">Tumaga Branch 🏪</option>
+                    <option value="Tetuan Branch 🏪">Tetuan Branch 🏪</option>
+                    <option value="Baliwasan Branch 🏪">Baliwasan Branch 🏪</option>
+                    <option value="Boalan Branch 🏪">Boalan Branch 🏪</option>
+                    <option value="Pilar Branch 🏪">Pilar Branch 🏪</option>
+                </select>
+            </div>
+            <div class="form-group full-width">
+                <label for="tableSelect">Select Dining Preference</label>
+                <select id="tableSelect" class="input-field">
+                    <option value="Takeout 🥡">Takeout 🥡</option>
+                    <option value="Dine-in 🪑">Dine-in 🪑</option>
+                </select>
+            </div>
+        `;
+        document.getElementById("summaryCostBreakdown").innerHTML = "";
+        document.getElementById("total").innerText = "₱" + currentSubtotal;
+    }
+
+    renderAdminDashboard();
+}
+
+function spawnConfettiShower() {
+    const colors = ['#C8B6A6', '#111111', '#FFD700', '#4CAF50', '#FFAB91', '#90CAF9'];
+    const particleCount = window.innerWidth < 480 ? 40 : 75;
+    for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement('div');
+        p.className = 'confetti-particle';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        p.style.transform = `scale(${Math.random() * 0.6 + 0.5})`;
+        p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+        p.style.animationDelay = (Math.random() * 0.4) + 's';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 3500);
+    }
+}
+
+function checkout(){
+    const cart = getCart();
+    const method = getOrderMethod();
+    if(cart.length === 0) return;
+
+    const nameInput = document.getElementById("custName");
+    const customerName = nameInput ? nameInput.value.trim() : "";
+
+    if(!customerName) {
+        alert("Please enter a name for the order record.");
+        if(nameInput) nameInput.focus();
+        return;
+    }
+
+    let customerPhone = "", customerAddress = "", locationDetails = "", selectedBarangay = "", deliveryCost = 0, zoneTier = "";
+
+    if(method === "delivery") {
+        const phoneInput = document.getElementById("custPhone");
+        const barangaySelect = document.getElementById("barangaySelect");
+        const addrInput = document.getElementById("custAddress");
+        
+        customerPhone = phoneInput ? phoneInput.value.trim() : "";
+        selectedBarangay = barangaySelect ? barangaySelect.value : "";
+        customerAddress = addrInput ? addrInput.value.trim() : "";
+
+        if(!customerPhone) { alert("Please provide a contact phone number."); return; }
+        if(!selectedBarangay) { alert("Please pick your Barangay."); return; }
+        if(!customerAddress) { alert("Please click on the map to pinpoint an address."); return; }
+
+        deliveryCost = ZAMBOANGA_DISTRICT_ZONES[selectedBarangay].cost;
+        zoneTier = ZAMBOANGA_DISTRICT_ZONES[selectedBarangay].distance;
+        locationDetails = `${selectedBarangay}, ${customerAddress} (${customerPhone})`;
+    } else {
+        const branchChosen = document.getElementById("branchSelect").value;
+        const diningPreference = document.getElementById("tableSelect").value;
+        locationDetails = `${branchChosen} [${diningPreference}]`;
+    }
+
+    const uniqueOrderCode = generateOrderCode();
+    let subtotal = 0;
+    cart.forEach(i => subtotal += (i.price * i.qty));
+    const finalBillAmount = subtotal + deliveryCost;
+
+    const currentOrdersLog = JSON.parse(localStorage.getItem("sipChillOrders")) || [];
+    const newPendingRecord = {
+        orderId: uniqueOrderCode,
+        customerName: customerName,
+        method: method === "delivery" ? "Delivery" : "Pickup",
+        locationInfo: locationDetails,
+        itemsCount: cart.reduce((total, item) => total + item.qty, 0),
+        totalAmount: finalBillAmount,
+        status: "Pending",
+        rating: null,
+        timestamp: new Date().toLocaleString()
+    };
+    currentOrdersLog.push(newPendingRecord);
+    localStorage.setItem("sipChillOrders", JSON.stringify(currentOrdersLog));
+
+    document.getElementById("notification").style.display = "block";
+    spawnConfettiShower();
+
+    showReceipt({
+        cart, 
+        orderCode: uniqueOrderCode, 
+        method, 
+        name: customerName, 
+        phone: customerPhone, 
+        barangay: selectedBarangay,
+        address: customerAddress,
+        locationSummary: locationDetails,
+        fee: deliveryCost,
+        tier: zoneTier
+    });
+
+    localStorage.removeItem("cart");
+
+    const btn = document.getElementById("placeOrderBtn");
+    if(btn) {
+        btn.disabled = true;
+        btn.textContent = "✓ Sent to Admin for Review";
+    }
+    
+    document.querySelectorAll(".input-field").forEach(el => el.disabled = true);
+    document.getElementById("cartContainer").innerHTML = "<p style='text-align:center;margin:20px 0;font-weight:600;color:var(--text-muted);'>Your order has been submitted to the kitchen.</p>";
+    document.getElementById("total").innerText = "₱0";
+    document.getElementById("summaryCostBreakdown").innerHTML = "";
+
+    renderAdminDashboard();
+}
+
+function showReceipt(orderData){
+    const modal = document.getElementById("receiptModal");
+    const itemsContainer = document.getElementById("receiptItems");
+    const totalContainer = document.getElementById("receiptTotal");
+    const codeContainer = document.getElementById("receiptCode");
+    const methodContainer = document.getElementById("receiptMethodType");
+    const metaContainer = document.getElementById("receiptCustomerMeta");
+    const breakdownContainer = document.getElementById("receiptCostBreakdown");
+
+    codeContainer.innerText = orderData.orderCode;
+    methodContainer.innerText = orderData.method === "delivery" ? "🛵 Delivery" : "🏃 Pickup";
+
+    if(orderData.method === "delivery") {
+        metaContainer.innerHTML = `
+            <div class="receipt-meta-title">Delivery Profile</div>
+            <div><b>Customer:</b> ${orderData.name}</div>
+            <div><b>Contact No:</b> ${orderData.phone}</div>
+            <div><b>Barangay:</b> ${orderData.barangay}</div>
+            <div><b>Address:</b> ${orderData.address}</div>
+        `;
+    } else {
+        metaContainer.innerHTML = `
+            <div class="receipt-meta-title">Pickup Profile</div>
+            <div><b>Customer:</b> ${orderData.name}</div>
+            <div><b>Route Plan:</b> ${orderData.locationSummary}</div>
+        `;
+    }
+
+    itemsContainer.innerHTML = "";
+    let subtotal = 0;
+
+    orderData.cart.forEach(item => {
+        const itemSubtotal = item.price * item.qty;
+        subtotal += itemSubtotal;
+        let details = (item.flavor || item.size) ? `<div class="receipt-item-details">${item.size} | ${item.flavor}</div>` : '';
+        
+        itemsContainer.innerHTML += `
+            <div class="receipt-item">
+                <div class="receipt-item-row">
+                    <span>${item.name} x${item.qty}</span>
+                    <span>₱${itemSubtotal}</span>
+                </div>
+                ${details}
+            </div>`;
+    });
+
+    breakdownContainer.innerHTML = `
+        <div style="display:flex; justify-content:space-between;"><span>Items Subtotal:</span><span>₱${subtotal}</span></div>
+        <div style="display:flex; justify-content:space-between;"><span>Delivery Fee:</span><span>₱${orderData.fee}</span></div>
+    `;
+    
+    totalContainer.innerText = "₱" + (subtotal + orderData.fee);
+    
+    modal.style.display = "flex";
+    setTimeout(() => modal.classList.add("active"), 10);
+}
+
+function closeReceipt() {
+    document.getElementById("receiptModal").classList.remove("active");
+    setTimeout(() => { 
+        document.getElementById("receiptModal").style.display = "none"; 
+        window.location.reload(); 
+    }, 300);
+}
+
+function renderAdminDashboard() {
+    const tableBody = document.getElementById("adminOrderTableBody");
+    if (!tableBody) return;
+    
+    const currentOrdersLog = JSON.parse(localStorage.getItem("sipChillOrders")) || [];
+    
+    if (currentOrdersLog.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; color: var(--text-muted); font-style: italic; padding: 20px;">No incoming processing orders detected.</td>
+            </tr>`;
+        return;
+    }
+    
+    tableBody.innerHTML = "";
+    currentOrdersLog.forEach((order, index) => {
+        let pillClass = "status-pending";
+        if (order.status === "Confirmed") pillClass = "status-confirmed";
+        if (order.status === "Cancelled") pillClass = "status-cancelled";
+        
+        tableBody.innerHTML += `
+            <tr>
+                <td>${order.timestamp}</td>
+                <td style="font-weight:700;">${order.orderId}</td>
+                <td>${order.method}</td>
+                <td><b>${order.customerName}</b><br><small>${order.locationInfo}</small></td>
+                <td>${order.itemsCount} Items</td>
+                <td>₱${order.totalAmount}</td>
+                <td><span class="status-pill ${pillClass}">${order.status}</span></td>
+                <td class="admin-actions">
+                    <select onchange="updateOrderStatus(${index}, this.value)">
+                        <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Confirmed" ${order.status === 'Confirmed' ? 'selected' : ''}>Confirm</option>
+                        <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancel</option>
+                    </select>
+                </td>
+            </tr>`;
+    });
+}
+
+function updateOrderStatus(index, newStatus) {
+    const currentOrdersLog = JSON.parse(localStorage.getItem("sipChillOrders")) || [];
+    if (currentOrdersLog[index]) {
+        currentOrdersLog[index].status = newStatus;
+        localStorage.setItem("sipChillOrders", JSON.stringify(currentOrdersLog));
+        renderAdminDashboard();
+    }
+}
+
+function clearAllOrdersLog() {
+    if (confirm("Are you sure you want to completely wipe the admin order terminal data history?")) {
+        localStorage.removeItem("sipChillOrders");
+        renderAdminDashboard();
+    }
+}
+
+window.onload = renderCheckoutPage;
+</script>
+</body>
+</html>
